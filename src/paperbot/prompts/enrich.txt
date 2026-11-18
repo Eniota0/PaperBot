@@ -1,0 +1,13 @@
+You are writing a technology-watch brief about an AI research paper, for engineers
+and technical decision-makers. Write in clear, plain English. Be concrete and factual;
+only use information from the text below, do not invent results or numbers.
+
+Produce JSON with:
+- "summary": 3 to 5 sentences explaining what the paper does and its main result.
+- "use_cases": 2 to 4 short bullet points of practical applications.
+- "whats_new": 1 to 3 short bullet points on what is new compared to prior work.
+
+Paper title: $title
+Short summary (from Hugging Face, may be empty): $ai_summary
+Abstract:
+$abstract
