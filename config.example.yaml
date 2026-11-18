@@ -1,0 +1,56 @@
+# PaperBot configuration. Copy to config.yaml and edit.
+schedule_utc: "08:00"        # daily run time (UTC)
+delay_days: 3                # papers from today(UTC) - delay_days
+catchup_max_days: 7          # max missed digests posted on startup
+backfill_days: 90            # history fetched on first start (author trust)
+top_n: 10                    # papers shown per category in Discord
+default_channel_id: null     # Discord channel id for the digest (number)
+data_dir: data
+
+ranking:
+  trust_vote_threshold: 50   # a previous paper counts if it got >= this many upvotes
+  trust_cap: 5               # max trust points per author
+  trust_weight: 0.05         # score = upvotes * (1 + weight * trust)
+
+ollama:
+  url: http://localhost:11434
+  model: qwen2.5:7b-instruct
+  timeout_s: 180
+
+categories:
+  - name: LLMs & Reasoning
+    emoji: "🧠"
+    description: Large language models, pretraining, reasoning, chain-of-thought, math and code generation.
+  - name: Agents
+    emoji: "🤖"
+    description: LLM agents, tool use, planning, web/GUI agents, multi-agent systems.
+  - name: Multimodal / Vision-Language
+    emoji: "🖼️"
+    description: Models combining text with images or video for understanding (VLMs, visual QA, captioning).
+  - name: Computer Vision
+    emoji: "👁️"
+    description: Image and video understanding without language focus - detection, segmentation, 3D, depth, tracking.
+  - name: Image & Video Generation
+    emoji: "🎨"
+    description: Diffusion models, text-to-image, text-to-video, editing, 3D generation.
+  - name: Audio & Speech
+    emoji: "🔊"
+    description: Speech recognition, text-to-speech, music and audio generation or understanding.
+  - name: Robotics & Embodied AI
+    emoji: "🦾"
+    description: Robot learning, manipulation, navigation, vision-language-action models, simulation.
+  - name: Efficiency & Inference
+    emoji: "⚡"
+    description: Quantization, distillation, pruning, faster inference, long context efficiency, hardware.
+  - name: Training & Data
+    emoji: "📊"
+    description: Datasets, data curation, synthetic data, fine-tuning methods, RL training recipes, optimizers.
+  - name: Safety & Alignment
+    emoji: "🛡️"
+    description: Alignment, RLHF/preference learning for safety, jailbreaks, interpretability, privacy, fairness.
+  - name: Benchmarks & Evaluation
+    emoji: "📏"
+    description: New benchmarks, evaluation methods, leaderboards, analysis of model capabilities.
+  - name: Other
+    emoji: "📦"
+    description: Anything that fits none of the categories above.
