@@ -63,6 +63,11 @@ class HFClient:
         for attempt in range(self.retries):
             try:
                 resp = self.client.get(url, params=params)
+                if resp.status_code == 404:
+                    log.info("HF has no daily papers for %s (404)", d)
+                    return []
+                if 400 <= resp.status_code < 500 and resp.status_code != 429:
+                    raise HFUnavailable(f"HF rejected the request for {d}: HTTP {resp.status_code}")
                 if resp.status_code >= 500 or resp.status_code == 429:
                     raise httpx.HTTPStatusError(
                         f"HTTP {resp.status_code}", request=resp.request, response=resp

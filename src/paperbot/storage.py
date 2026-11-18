@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import threading
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from paperbot.models import Author, Enrichment, Paper
@@ -113,6 +113,18 @@ class Storage:
         )
         v = rows[0][0]
         return date.fromisoformat(v) if v else None
+
+    def posted_dates(self, channel_id: int) -> set[date]:
+        rows = self._exec("SELECT date FROM posts WHERE channel_id = ?", (channel_id,))
+        return {date.fromisoformat(r[0]) for r in rows}
+
+    def channel_floor(self, channel_id: int) -> date | None:
+        """First date this channel should ever receive, or None if it never received anything."""
+        rows = self._exec("SELECT baseline FROM guild_channels WHERE channel_id = ?", (channel_id,))
+        if rows:
+            return date.fromisoformat(rows[0][0]) + timedelta(days=1)
+        rows = self._exec("SELECT MIN(date) FROM posts WHERE channel_id = ?", (channel_id,))
+        return date.fromisoformat(rows[0][0]) if rows[0][0] else None
 
     def set_guild_channel(self, guild_id: int, channel_id: int, baseline: date) -> None:
         self._exec("INSERT OR REPLACE INTO guild_channels VALUES (?, ?, ?)",

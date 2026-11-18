@@ -44,3 +44,17 @@ def test_model_not_found_is_unavailable():  # model not pulled -> abort, don't f
     respx.post(URL).mock(return_value=httpx.Response(404, json={"error": "model 'm' not found"}))
     with pytest.raises(LLMUnavailable, match="ollama pull m"):
         provider().complete_json("p", SCHEMA)
+
+
+@respx.mock
+def test_server_error_is_unavailable():  # review I1: GPU busy / OOM must not degrade a whole day
+    respx.post(URL).mock(return_value=httpx.Response(500, json={"error": "model requires more system memory"}))
+    with pytest.raises(LLMUnavailable):
+        provider().complete_json("p", SCHEMA)
+
+
+@respx.mock
+def test_read_timeout_is_unavailable():  # review I1
+    respx.post(URL).mock(side_effect=httpx.ReadTimeout("slow"))
+    with pytest.raises(LLMUnavailable):
+        provider().complete_json("p", SCHEMA)

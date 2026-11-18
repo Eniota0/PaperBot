@@ -10,7 +10,7 @@ from discord import app_commands
 from discord.ext import tasks
 
 from paperbot.config import Settings
-from paperbot.dates import catchup_dates, new_channel_baseline, target_date
+from paperbot.dates import new_channel_baseline, pending_dates, target_date
 from paperbot.digest import build_digest, chunk_embeds
 from paperbot.hf_client import HFUnavailable
 from paperbot.llm import LLMUnavailable
@@ -22,7 +22,10 @@ EMBED_COLOR = 0xFFB000
 
 
 def plan_cycle(storage: Storage, channels: list[int], target: date, max_days: int) -> dict[int, list[date]]:
-    return {ch: catchup_dates(storage.last_posted(ch), target, max_days) for ch in channels}
+    return {
+        ch: pending_dates(storage.channel_floor(ch), storage.posted_dates(ch), target, max_days)
+        for ch in channels
+    }
 
 
 class CategoryPdfSelect(
@@ -158,8 +161,10 @@ class PaperBot(discord.Client):
                 for d in dates:
                     if d not in ready:
                         ready[d] = await self._process(d)
-                    if not ready[d] or not await self.post_digest(ch, d):
-                        break  # later dates wait for the next cycle, so nothing is skipped
+                    if not ready[d]:
+                        continue  # retried next cycle while inside the catch-up window
+                    if not await self.post_digest(ch, d):
+                        break  # channel problem: stop for this channel, retry next cycle
 
     async def post_digest(self, channel_id: int, d: date) -> bool:
         groups = await asyncio.to_thread(self.pipeline.ranked, d)
@@ -169,16 +174,21 @@ class PaperBot(discord.Client):
             return True
         try:
             channel = self.get_channel(channel_id) or await self.fetch_channel(channel_id)
+            guild = getattr(channel, "guild", None)
+            if guild is not None and guild.me is not None:
+                perms = channel.permissions_for(guild.me)
+                if not (perms.send_messages and perms.embed_links):
+                    log.warning("Missing Send Messages / Embed Links permission in channel %s", channel_id)
+                    return False
             digest = build_digest(d, groups, self.settings.top_n)
-            await channel.send(digest.header)
-            for chunk in chunk_embeds(digest.embeds):
-                await channel.send(embeds=[
-                    discord.Embed(title=e.title, description=e.description, color=EMBED_COLOR) for e in chunk
-                ])
+            for i, chunk in enumerate(chunk_embeds(digest.embeds)):
+                embeds = [discord.Embed(title=e.title, description=e.description, color=EMBED_COLOR) for e in chunk]
+                # header rides with the first embeds, so a failure never leaves a lone header behind
+                await channel.send(digest.header if i == 0 else None, embeds=embeds)
             view = discord.ui.View(timeout=None)
             view.add_item(CategoryPdfSelect(d, [(g.category.emoji, g.category.name) for g in groups]))
             await channel.send("Full summaries, use cases and what's new — pick a category:", view=view)
-        except (discord.NotFound, discord.Forbidden) as e:
+        except discord.HTTPException as e:  # includes NotFound / Forbidden / 5xx
             log.warning("Cannot post in channel %s: %s", channel_id, e)
             return False
         self.storage.mark_posted(channel_id, d)

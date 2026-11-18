@@ -54,3 +54,17 @@ def test_fetch_ok():
 def test_fetch_empty_day():
     respx.get(URL).mock(return_value=httpx.Response(200, json=[]))
     assert HFClient(backoff_s=0).fetch_daily(D) == []
+
+
+@respx.mock
+def test_404_is_empty_day():  # review I2
+    respx.get(URL).mock(return_value=httpx.Response(404))
+    assert HFClient(backoff_s=0).fetch_daily(D) == []
+
+
+@respx.mock
+def test_client_error_not_retried():  # review I2
+    route = respx.get(URL).mock(return_value=httpx.Response(400))
+    with pytest.raises(HFUnavailable):
+        HFClient(backoff_s=0).fetch_daily(D)
+    assert route.call_count == 1

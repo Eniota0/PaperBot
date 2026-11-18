@@ -24,14 +24,18 @@ class OllamaProvider:
         }
         try:
             resp = self.client.post(f"{self.url}/api/chat", json=body)
-        except (httpx.ConnectError, httpx.ConnectTimeout) as e:
+        except httpx.ConnectError as e:
             raise LLMUnavailable(f"Cannot reach Ollama at {self.url}. Is Ollama running? ({e})") from e
+        except httpx.TimeoutException as e:
+            raise LLMUnavailable(f"Ollama timed out (GPU busy or model too slow?): {e}") from e
         except httpx.HTTPError as e:
             raise LLMError(f"Ollama request failed: {e}") from e
         if resp.status_code == 404:
             raise LLMUnavailable(
                 f"Ollama model '{self.model}' not found. Run: ollama pull {self.model}"
             )
+        if resp.status_code >= 500:
+            raise LLMUnavailable(f"Ollama server error {resp.status_code}: {resp.text[:200]}")
         if resp.status_code >= 400:
             raise LLMError(f"Ollama error {resp.status_code}: {resp.text[:200]}")
         try:
