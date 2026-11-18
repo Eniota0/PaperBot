@@ -27,7 +27,7 @@ The bot works only while it is running. If your PC was off, it catches up on mis
 ### 1. Install the prerequisites
 
 - **Python 3.11 or newer**: <https://www.python.org/downloads/>. During setup, tick *Add python.exe to PATH*.
-- **Ollama** (runs the local model on your GPU): <https://ollama.com/download/windows>
+- **Ollama 0.5 or newer** (runs the local model on your GPU): <https://ollama.com/download/windows>
 - **Git** (optional, to clone this repository).
 
 Then download the model (about 5 GB; an RTX 3060 runs it well). In PowerShell:
