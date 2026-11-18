@@ -1,0 +1,22 @@
+[
+  {"paper": {"id": "2611.00001", "title": "Scaling Test-Time Compute for Reasoners",
+    "summary": "We study how to scale inference compute for reasoning models.",
+    "upvotes": 142, "publishedAt": "2026-11-09T12:00:00.000Z",
+    "ai_summary": "Scaling inference compute improves reasoning.",
+    "ai_keywords": ["test-time compute", "reasoning"],
+    "authors": [
+      {"_id": "a1", "name": "Alice Martin", "hidden": false,
+       "user": {"_id": "u1", "user": "alicem", "fullname": "Alice Martin", "type": "user"}},
+      {"_id": "a2", "name": "Bob Chen", "hidden": false}
+    ]},
+   "title": "Scaling Test-Time Compute for Reasoners", "numComments": 4},
+  {"paper": {"id": "2611.00002", "title": "A Video Diffusion Model",
+    "summary": "A new video diffusion model.", "upvotes": 57,
+    "ai_keywords": ["video diffusion"],
+    "authors": [{"_id": "a3", "name": "Zoë Łukasz",
+       "user": {"_id": "u3", "user": "zoel", "type": "user"}}]},
+   "title": "A Video Diffusion Model", "numComments": 0},
+  {"paper": {"id": "2611.00003", "title": "Untitled Agent Benchmark", "summary": null,
+    "upvotes": 3, "authors": [{"_id": "a4", "name": "Carol"}]},
+   "title": "Untitled Agent Benchmark"}
+]
