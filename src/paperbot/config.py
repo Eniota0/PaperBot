@@ -51,6 +51,7 @@ class Settings(BaseModel):
     catchup_max_days: int = 7
     backfill_days: int = 90
     top_n: int = 10
+    min_upvotes: int = 10
     default_channel_id: int | None = None
     data_dir: Path = Path("data")
     ranking: RankingSettings = RankingSettings()

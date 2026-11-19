@@ -118,6 +118,7 @@ starts with Windows by default.
 | `delay_days` | `3` | Look at papers from this many days ago |
 | `catchup_max_days` | `7` | Most digests posted on startup after the PC was off |
 | `backfill_days` | `90` | History fetched on first start (for author trust) |
+| `min_upvotes` | `10` | Papers below this are neither shown nor summarised (still used for author trust). `0` shows everything |
 | `top_n` | `10` | Papers shown per category in Discord (the rest are in the PDF) |
 | `default_channel_id` | `null` | Your digest channel |
 | `ranking.trust_vote_threshold` | `50` | A previous paper counts towards trust if it got at least this many upvotes |

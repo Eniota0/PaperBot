@@ -13,7 +13,7 @@ def test_example_config_loads(tmp_path):
     s = load_settings(EXAMPLE, tmp_path / "missing.env")
     assert s.delay_days == 3 and s.schedule_utc == time(8, 0)
     assert s.ranking.trust_weight == 0.05 and s.top_n == 10
-    assert s.catchup_max_days == 7 and s.backfill_days == 90
+    assert s.catchup_max_days == 7 and s.backfill_days == 90 and s.min_upvotes == 10
     assert s.ollama.model == "qwen3.5:4b" and s.ollama.think is False
     assert [c.name for c in s.categories][-1] == "Other" and len(s.categories) == 12
     assert s.db_path == Path("data") / "paperbot.db"

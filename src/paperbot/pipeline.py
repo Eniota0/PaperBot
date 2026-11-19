@@ -27,8 +27,10 @@ class Pipeline:
         """Process date d. HFUnavailable / LLMUnavailable propagate; d is then not marked done."""
         fetched = self.hf.fetch_daily(d)
         self.storage.upsert_papers(fetched)
-        papers = self.storage.papers_for_date(d)
-        log.info("%s: %d papers", d, len(papers))
+        all_papers = self.storage.papers_for_date(d)
+        papers = [p for p in all_papers if p.upvotes >= self.settings.min_upvotes]
+        log.info("%s: %d papers, %d with at least %d upvotes",
+                 d, len(all_papers), len(papers), self.settings.min_upvotes)
 
         todo = [p for p in papers if force or p.category is None]
         for i, p in enumerate(todo, 1):
@@ -49,7 +51,8 @@ class Pipeline:
         def trust_of(user: str) -> int:
             return author_trust(self.storage.author_upvotes_before(user, d), r.trust_vote_threshold, r.trust_cap)
 
-        return rank_day(self.storage.papers_for_date(d), self.settings.categories, trust_of, r)
+        shown = [p for p in self.storage.papers_for_date(d) if p.upvotes >= self.settings.min_upvotes]
+        return rank_day(shown, self.settings.categories, trust_of, r)
 
     def backfill(self, days: int, today: date) -> int:
         """Fetch metadata (no LLM) for the `days` dates before the current target date."""

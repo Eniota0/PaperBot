@@ -4,6 +4,7 @@ delay_days: 3                # papers from today(UTC) - delay_days
 catchup_max_days: 7          # max missed digests posted on startup
 backfill_days: 90            # history fetched on first start (author trust)
 top_n: 10                    # papers shown per category in Discord
+min_upvotes: 10              # papers below this are not shown nor summarised (0 = show all)
 default_channel_id: null     # Discord channel id for the digest (number)
 data_dir: data
 

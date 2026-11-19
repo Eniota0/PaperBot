@@ -101,3 +101,24 @@ def test_backfill_makes_no_llm_calls_and_covers_range(settings, store):
     n = make(settings, store, hf, llm).backfill(3, today)
     assert sorted(hf.calls) == days and n == 2 and llm.prompts == []
     assert not store.is_date_done(date(2026, 11, 12))
+
+
+def test_low_vote_papers_hidden_and_not_sent_to_llm(settings, store):
+    s = settings.model_copy(update={"min_upvotes": 10})
+    llm = FakeLLM(responder=schema_responder)
+    groups = make(s, store, FakeHF({D: [mk(1, votes=3), mk(2, votes=30)]}), llm).run(D)
+    assert [rp.paper.arxiv_id for g in groups for rp in g.papers] == ["p2"]
+    assert len(llm.prompts) == 2 and all("T1" not in p for p in llm.prompts)
+    assert len(store.papers_for_date(D)) == 2  # still stored for author history
+
+
+def test_min_upvotes_threshold_inclusive(settings, store):
+    s = settings.model_copy(update={"min_upvotes": 10})
+    groups = make(s, store, FakeHF({D: [mk(1, votes=10)]}), FakeLLM(responder=schema_responder)).run(D)
+    assert len(groups) == 1
+
+
+def test_all_below_threshold_gives_empty_day(settings, store):
+    s = settings.model_copy(update={"min_upvotes": 10})
+    assert make(s, store, FakeHF({D: [mk(1, votes=2)]}), FakeLLM()).run(D) == []
+    assert store.is_date_done(D)
