@@ -31,7 +31,7 @@ def _short(title: str) -> str:
 
 
 def _line(rp: RankedPaper, tiers: list[Tier]) -> str:
-    star = " ⭐" if rp.trust else ""
+    star = (" ⭐" if rp.trust else "") + (f" · also {rp.secondary.emoji}" if rp.secondary else "")
     link = f"[{_short(rp.paper.title)}]({rp.paper.hf_url})"
     tier = tier_for(rp.paper.upvotes, tiers)
     if tier:

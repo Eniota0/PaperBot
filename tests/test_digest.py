@@ -77,3 +77,10 @@ def test_header_counts_tiers_highest_first():
 def test_no_tiers_keeps_plain_output():
     d = build_digest(D, [votes_group(231)], 10)
     assert d.header.endswith("1 papers") and "**" not in d.embeds[0].description
+
+
+def test_also_tag_for_secondary():
+    robo = Category(name="Robotics & Embodied AI", emoji="🦾", description="d")
+    g = group_of(1)
+    g.papers[0].secondary = robo
+    assert build_digest(D, [g], 10).embeds[0].description.endswith(" · also 🦾")

@@ -22,7 +22,7 @@ class OllamaProvider:
             "messages": [{"role": "user", "content": prompt}],
             "format": schema,
             "stream": False,
-            "options": {"temperature": 0.2},
+            "options": {"temperature": 0, "seed": 42},  # deterministic: same paper, same answer
         }
         if self.think is not None:
             body["think"] = self.think

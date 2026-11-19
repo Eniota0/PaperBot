@@ -1,12 +1,15 @@
 You are classifying AI research papers for a technology-watch digest.
-Choose exactly ONE category for the paper below, from this list:
+Categories:
 
 $categories
 
 Rules:
-- Pick the category that best describes the paper's main contribution.
+- "category": the ONE category that best describes the paper's main contribution.
+  When several fit, follow the hints in the descriptions above.
+- "secondary": a second category ONLY if the paper clearly and substantially belongs
+  to it too; otherwise "none". Most papers have "none". Never repeat the main category.
 - Use "Other" only if none of the categories fit.
-- Answer with JSON: {"category": "<exact category name>"}
+- Answer with JSON: {"category": "<exact category name>", "secondary": "<exact category name or none>"}
 
 Paper title: $title
 Keywords: $keywords

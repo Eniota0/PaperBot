@@ -30,6 +30,7 @@ class Paper(BaseModel):
     ai_summary: str | None = None
     ai_keywords: list[str] = Field(default_factory=list)
     category: str | None = None
+    secondary_category: str | None = None
     enrichment: Enrichment | None = None
 
     @property
@@ -46,9 +47,11 @@ class RankedPaper(BaseModel):
     rank: int
     score: float
     trust: int
+    secondary: Category | None = None  # "also relevant to" tag
 
 
 class CategoryGroup(BaseModel):
     category: Category
     papers: list[RankedPaper]
     total_upvotes: int
+    related: list[RankedPaper] = Field(default_factory=list)  # papers whose secondary category is this one

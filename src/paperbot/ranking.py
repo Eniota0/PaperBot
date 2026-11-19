@@ -22,6 +22,7 @@ def rank_day(
     cfg: RankingSettings,
 ) -> list[CategoryGroup]:
     known = {c.name for c in categories}
+    by_name = {c.name: c for c in categories}
     buckets: dict[str, list[tuple[Paper, int, float]]] = {c.name: [] for c in categories}
     for p in papers:
         users = {a.hf_user for a in p.authors if a.hf_user}
@@ -36,9 +37,19 @@ def rank_day(
             continue
         groups.append(CategoryGroup(
             category=c,
-            papers=[RankedPaper(paper=p, rank=i + 1, score=s, trust=t) for i, (p, t, s) in enumerate(items)],
+            papers=[
+                RankedPaper(paper=p, rank=i + 1, score=s, trust=t, secondary=by_name.get(p.secondary_category))
+                for i, (p, t, s) in enumerate(items)
+            ],
             total_upvotes=sum(p.upvotes for p, _, _ in items),
         ))
+    by_group = {g.category.name: g for g in groups}
+    for g in groups:
+        for rp in g.papers:
+            if rp.secondary and rp.secondary.name in by_group:
+                by_group[rp.secondary.name].related.append(rp)
+    for g in groups:
+        g.related.sort(key=lambda rp: (-rp.score, -rp.paper.upvotes, rp.paper.arxiv_id))
     order = {c.name: i for i, c in enumerate(categories)}
     groups.sort(key=lambda g: (-g.total_upvotes, order[g.category.name]))
     return groups

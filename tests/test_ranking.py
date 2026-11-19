@@ -54,3 +54,24 @@ def test_unknown_category_goes_to_other(settings):
 def test_ties_broken_by_votes_then_id(settings):
     groups = rank_day([mk(2, 10), mk(1, 10)], settings.categories, lambda u: 0, settings.ranking)
     assert [r.paper.arxiv_id for r in groups[0].papers] == ["p1", "p2"]
+
+
+def test_secondary_gives_tag_and_related(settings):
+    a = mk(1, 50, "Agents").model_copy(update={"secondary_category": "Robotics & Embodied AI"})
+    b = mk(2, 20, "Robotics & Embodied AI")
+    groups = {g.category.name: g for g in rank_day([a, b], settings.categories, lambda u: 0, settings.ranking)}
+    assert groups["Agents"].papers[0].secondary.name == "Robotics & Embodied AI"
+    assert [r.paper.arxiv_id for r in groups["Robotics & Embodied AI"].related] == ["p1"]
+    assert groups["Robotics & Embodied AI"].total_upvotes == 20  # related papers don't count
+    assert groups["Agents"].related == []
+
+
+def test_related_only_category_is_omitted(settings):
+    a = mk(1, 50, "Agents").model_copy(update={"secondary_category": "Robotics & Embodied AI"})
+    assert [g.category.name for g in rank_day([a], settings.categories, lambda u: 0, settings.ranking)] == ["Agents"]
+
+
+def test_unknown_secondary_ignored(settings):
+    a = mk(1, 50, "Agents").model_copy(update={"secondary_category": "Quantum"})
+    g = rank_day([a], settings.categories, lambda u: 0, settings.ranking)[0]
+    assert g.papers[0].secondary is None

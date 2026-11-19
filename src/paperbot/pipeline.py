@@ -34,7 +34,8 @@ class Pipeline:
 
         todo = [p for p in papers if force or p.category is None]
         for i, p in enumerate(todo, 1):
-            self.storage.set_category(p.arxiv_id, categorize(p, self.settings.categories, self.llm))
+            primary, secondary = categorize(p, self.settings.categories, self.llm)
+            self.storage.set_category(p.arxiv_id, primary, secondary)
             log.info("%s: categorised %d/%d", d, i, len(todo))
 
         todo = [p for p in papers if force or p.enrichment is None]

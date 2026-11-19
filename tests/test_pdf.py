@@ -71,3 +71,11 @@ def test_renders_with_tiers(tmp_path):
     hot = rp(GOOD).model_copy(update={"paper": rp(GOOD).paper.model_copy(update={"upvotes": 130})})
     p = render_category_pdf(D, group(hot), tmp_path / "t.pdf", TIERS)
     assert p.read_bytes()[:5] == b"%PDF-"
+
+
+def test_renders_related_section(tmp_path):
+    from paperbot.pdf import related_lines
+    other = rp(GOOD).model_copy(update={"paper": rp(GOOD).paper.model_copy(update={"category": "Agents", "arxiv_id": "x2"})})
+    g = group(rp(GOOD)).model_copy(update={"related": [other]})
+    assert render_category_pdf(D, g, tmp_path / "r.pdf").read_bytes()[:5] == b"%PDF-"
+    assert related_lines(other) == "Main category: Agents"

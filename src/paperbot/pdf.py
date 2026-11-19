@@ -39,7 +39,61 @@ def tier_label(rp: RankedPaper, tiers: list[Tier]) -> tuple[str, tuple[int, int,
     return (t.name.upper(), t.rgb) if t else None
 
 
+def related_lines(rp: RankedPaper) -> str:
+    return f"Main category: {rp.paper.category or 'Other'}"
+
+
+def _draw_paper(pdf: FPDF, rp: RankedPaper, tiers: list[Tier], heading: str, note: str | None = None) -> None:
+    p = rp.paper
+    w = pdf.epw
+    pdf.set_font("DejaVu", "B", 13)
+    pdf.multi_cell(w, 7, heading, **NL)
+    pdf.set_font("DejaVu", "", 9)
+    if note:
+        pdf.set_text_color(110, 110, 110)
+        pdf.multi_cell(w, 5, note, **NL)
+        pdf.set_text_color(0, 0, 0)
+    if p.authors:
+        pdf.multi_cell(w, 5, ", ".join(a.name for a in p.authors), **NL)
+    star = "   ★ trusted author" if rp.trust else ""
+    label = tier_label(rp, tiers)
+    if label:
+        name, rgb = label
+        votes = f"▲ {p.upvotes} upvotes   "
+        pdf.cell(pdf.get_string_width(votes), 5, votes)
+        pdf.set_font("DejaVu", "B", 9)
+        pdf.set_text_color(*rgb)
+        pdf.cell(pdf.get_string_width(f"● {name}") + 1, 5, f"● {name}")
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("DejaVu", "", 9)
+        pdf.cell(0, 5, star, **NL)
+    else:
+        pdf.multi_cell(w, 5, f"▲ {p.upvotes} upvotes{star}", **NL)
+    pdf.set_text_color(30, 80, 200)
+    pdf.cell(0, 5, "Hugging Face page", link=p.hf_url, **NL)
+    pdf.cell(0, 5, "arXiv", link=p.arxiv_url, **NL)
+    pdf.set_text_color(0, 0, 0)
+    pdf.ln(2)
+    for title, body in paper_sections(rp):
+        if not body:
+            continue
+        pdf.set_font("DejaVu", "B", 11)
+        pdf.cell(w, 6, title, **NL)
+        pdf.set_font("DejaVu", "", 10)
+        if isinstance(body, str):
+            pdf.multi_cell(w, 5, body, **NL)
+        else:
+            for item in body:
+                pdf.multi_cell(w, 5, f"•  {item}", **NL)
+        pdf.ln(1)
+    pdf.ln(3)
+    pdf.set_draw_color(200, 200, 200)
+    pdf.line(pdf.l_margin, pdf.get_y(), pdf.l_margin + w, pdf.get_y())
+    pdf.ln(4)
+
+
 def render_category_pdf(d: date, group: CategoryGroup, out_path: Path, tiers: list[Tier] = ()) -> Path:
+    tiers = list(tiers)
     assets = files("paperbot.assets")
     with as_file(assets / "DejaVuSans.ttf") as reg, as_file(assets / "DejaVuSans-Bold.ttf") as bold:
         pdf = FPDF(format="A4")
@@ -53,51 +107,24 @@ def render_category_pdf(d: date, group: CategoryGroup, out_path: Path, tiers: li
         pdf.set_font("DejaVu", "B", 18)
         pdf.multi_cell(w, 9, f"{group.category.name} — HF Papers {d:%Y-%m-%d}", **NL)
         pdf.set_font("DejaVu", "", 11)
-        pdf.cell(w, 7, f"{len(group.papers)} papers", **NL)
+        extra = f" · {len(group.related)} also relevant" if group.related else ""
+        pdf.cell(w, 7, f"{len(group.papers)} papers{extra}", **NL)
         pdf.ln(4)
 
         for rp in group.papers:
-            p = rp.paper
-            pdf.set_font("DejaVu", "B", 13)
-            pdf.multi_cell(w, 7, f"#{rp.rank}  {p.title}", **NL)
-            pdf.set_font("DejaVu", "", 9)
-            if p.authors:
-                pdf.multi_cell(w, 5, ", ".join(a.name for a in p.authors), **NL)
-            star = "   ★ trusted author" if rp.trust else ""
-            label = tier_label(rp, tiers)
-            if label:
-                name, rgb = label
-                votes = f"▲ {p.upvotes} upvotes   "
-                pdf.cell(pdf.get_string_width(votes), 5, votes)
-                pdf.set_font("DejaVu", "B", 9)
-                pdf.set_text_color(*rgb)
-                pdf.cell(pdf.get_string_width(f"● {name}") + 1, 5, f"● {name}")
-                pdf.set_text_color(0, 0, 0)
-                pdf.set_font("DejaVu", "", 9)
-                pdf.cell(0, 5, star, **NL)
-            else:
-                pdf.multi_cell(w, 5, f"▲ {p.upvotes} upvotes{star}", **NL)
-            pdf.set_text_color(30, 80, 200)
-            pdf.cell(0, 5, "Hugging Face page", link=p.hf_url, **NL)
-            pdf.cell(0, 5, "arXiv", link=p.arxiv_url, **NL)
-            pdf.set_text_color(0, 0, 0)
+            _draw_paper(pdf, rp, tiers, f"#{rp.rank}  {rp.paper.title}")
+
+        if group.related:
             pdf.ln(2)
-            for heading, body in paper_sections(rp):
-                if not body:
-                    continue
-                pdf.set_font("DejaVu", "B", 11)
-                pdf.cell(w, 6, heading, **NL)
-                pdf.set_font("DejaVu", "", 10)
-                if isinstance(body, str):
-                    pdf.multi_cell(w, 5, body, **NL)
-                else:
-                    for item in body:
-                        pdf.multi_cell(w, 5, f"•  {item}", **NL)
-                pdf.ln(1)
+            pdf.set_font("DejaVu", "B", 15)
+            pdf.cell(w, 8, "Also relevant", **NL)
+            pdf.set_font("DejaVu", "", 9)
+            pdf.set_text_color(110, 110, 110)
+            pdf.multi_cell(w, 5, "Papers filed under another category that also concern this one.", **NL)
+            pdf.set_text_color(0, 0, 0)
             pdf.ln(3)
-            pdf.set_draw_color(200, 200, 200)
-            pdf.line(pdf.l_margin, pdf.get_y(), pdf.l_margin + w, pdf.get_y())
-            pdf.ln(4)
+            for rp in group.related:
+                _draw_paper(pdf, rp, tiers, rp.paper.title, related_lines(rp))
 
         out_path.parent.mkdir(parents=True, exist_ok=True)
         pdf.output(str(out_path))

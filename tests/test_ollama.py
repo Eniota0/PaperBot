@@ -72,3 +72,10 @@ def test_think_flag_omitted_by_default():
     route = respx.post(URL).mock(return_value=httpx.Response(200, json={"message": {"content": "{}"}}))
     provider().complete_json("p", SCHEMA)
     assert "think" not in json.loads(route.calls.last.request.content)
+
+
+@respx.mock
+def test_deterministic_options():  # same paper -> same answer
+    route = respx.post(URL).mock(return_value=httpx.Response(200, json={"message": {"content": "{}"}}))
+    provider().complete_json("p", SCHEMA)
+    assert json.loads(route.calls.last.request.content)["options"] == {"temperature": 0, "seed": 42}

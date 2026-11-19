@@ -38,6 +38,9 @@ class Storage:
         self._lock = threading.Lock()
         with self._lock, self._conn:
             self._conn.executescript(SCHEMA)
+            cols = {r[1] for r in self._conn.execute("PRAGMA table_info(papers)")}
+            if "secondary_category" not in cols:  # migrate databases created before this column
+                self._conn.execute("ALTER TABLE papers ADD COLUMN secondary_category TEXT")
 
     def close(self) -> None:
         self._conn.close()
@@ -71,6 +74,7 @@ class Storage:
             ai_keywords=json.loads(r["ai_keywords"]),
             authors=[Author(**a) for a in json.loads(r["authors"])],
             category=r["category"],
+            secondary_category=r["secondary_category"],
             enrichment=Enrichment(**json.loads(r["enrichment"])) if r["enrichment"] else None,
         )
 
@@ -78,8 +82,9 @@ class Storage:
         rows = self._exec("SELECT * FROM papers WHERE date = ? ORDER BY arxiv_id", (d.isoformat(),))
         return [self._row_to_paper(r) for r in rows]
 
-    def set_category(self, arxiv_id: str, category: str) -> None:
-        self._exec("UPDATE papers SET category = ? WHERE arxiv_id = ?", (category, arxiv_id))
+    def set_category(self, arxiv_id: str, category: str, secondary: str | None = None) -> None:
+        self._exec("UPDATE papers SET category = ?, secondary_category = ? WHERE arxiv_id = ?",
+                   (category, secondary, arxiv_id))
 
     def set_enrichment(self, arxiv_id: str, e: Enrichment) -> None:
         self._exec("UPDATE papers SET enrichment = ? WHERE arxiv_id = ?", (e.model_dump_json(), arxiv_id))

@@ -59,3 +59,26 @@ def test_is_empty_and_file_db(tmp_path, paper):
     assert not s.is_empty()
     s.close()
     assert Storage(tmp_path / "sub" / "db.sqlite").papers_for_date(paper.date)
+
+
+def test_secondary_category_roundtrip(store, paper):
+    store.upsert_papers([paper])
+    store.set_category(paper.arxiv_id, "Agents", "Robotics & Embodied AI")
+    p = store.papers_for_date(paper.date)[0]
+    assert (p.category, p.secondary_category) == ("Agents", "Robotics & Embodied AI")
+
+
+def test_migrates_old_database(tmp_path, paper):
+    import sqlite3
+    path = tmp_path / "old.db"
+    con = sqlite3.connect(path)
+    con.execute("""CREATE TABLE papers (arxiv_id TEXT PRIMARY KEY, date TEXT NOT NULL, title TEXT NOT NULL,
+      abstract TEXT NOT NULL DEFAULT '', upvotes INTEGER NOT NULL DEFAULT 0, ai_summary TEXT,
+      ai_keywords TEXT NOT NULL DEFAULT '[]', authors TEXT NOT NULL DEFAULT '[]', category TEXT, enrichment TEXT)""")
+    con.execute("INSERT INTO papers (arxiv_id, date, title, category) VALUES ('old1', '2026-11-15', 'Old', 'Agents')")
+    con.commit(); con.close()
+    s = Storage(path)
+    p = s.papers_for_date(paper.date)[0]
+    assert p.category == "Agents" and p.secondary_category is None
+    s.set_category("old1", "Agents", "Other")
+    s.close()

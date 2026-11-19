@@ -28,37 +28,37 @@ tiers:
 categories:
   - name: LLMs & Reasoning
     emoji: "🧠"
-    description: Large language models, pretraining, reasoning, chain-of-thought, math and code generation.
+    description: Large language models, pretraining, reasoning, chain-of-thought, math and code generation. If the focus is an agent acting with tools, use Agents; if it is mainly training data or recipes, use Training & Data.
   - name: Agents
     emoji: "🤖"
-    description: LLM agents, tool use, planning, web/GUI agents, multi-agent systems.
+    description: Software agents built on LLMs - tool use, planning, web/GUI/computer-use agents, multi-agent systems. Agents that control physical robots go to Robotics & Embodied AI.
   - name: Multimodal / Vision-Language
     emoji: "🖼️"
-    description: Models combining text with images or video for understanding (VLMs, visual QA, captioning).
+    description: Models combining text with images or video for understanding (VLMs, visual QA, captioning, document understanding). Generating images or video goes to Image & Video Generation.
   - name: Computer Vision
     emoji: "👁️"
-    description: Image and video understanding without language focus - detection, segmentation, 3D, depth, tracking.
+    description: Image and video understanding without a language focus - detection, segmentation, 3D reconstruction, depth, tracking. If text is central, use Multimodal / Vision-Language.
   - name: Image & Video Generation
     emoji: "🎨"
-    description: Diffusion models, text-to-image, text-to-video, editing, 3D generation.
+    description: Diffusion and other generative models - text-to-image, text-to-video, image/video editing, 3D and avatar generation.
   - name: Audio & Speech
     emoji: "🔊"
-    description: Speech recognition, text-to-speech, music and audio generation or understanding.
+    description: Speech recognition, text-to-speech, voice, music and audio generation or understanding.
   - name: Robotics & Embodied AI
     emoji: "🦾"
-    description: Robot learning, manipulation, navigation, vision-language-action models, simulation.
+    description: Physical robots and embodied agents - manipulation, navigation, vision-language-action models, robot learning, simulation for robots. Includes LLM- or agent-based robots.
   - name: Efficiency & Inference
     emoji: "⚡"
-    description: Quantization, distillation, pruning, faster inference, long context efficiency, hardware.
+    description: Making models cheaper or faster - quantization, distillation, pruning, sparse/MoE efficiency, serving, long-context efficiency, hardware.
   - name: Training & Data
     emoji: "📊"
-    description: Datasets, data curation, synthetic data, fine-tuning methods, RL training recipes, optimizers.
+    description: Datasets, data curation, synthetic data, fine-tuning methods, RL training recipes, optimizers, scaling laws.
   - name: Safety & Alignment
     emoji: "🛡️"
-    description: Alignment, RLHF/preference learning for safety, jailbreaks, interpretability, privacy, fairness.
+    description: Alignment, preference learning for safety, jailbreaks and red-teaming, interpretability, privacy, fairness, watermarking.
   - name: Benchmarks & Evaluation
     emoji: "📏"
-    description: New benchmarks, evaluation methods, leaderboards, analysis of model capabilities.
+    description: Papers whose main contribution is a new benchmark, evaluation method, or analysis of model capabilities. A model paper that also reports benchmarks belongs to the model's topic.
   - name: Other
     emoji: "📦"
     description: Anything that fits none of the categories above.

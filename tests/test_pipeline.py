@@ -13,7 +13,7 @@ D = date(2026, 11, 15)
 
 def schema_responder(prompt, schema):
     if "category" in schema["properties"]:
-        return {"category": "Agents"}
+        return {"category": "Agents", "secondary": "Robotics & Embodied AI"}
     return {"summary": "S.", "use_cases": ["u"], "whats_new": ["n"]}
 
 
@@ -122,3 +122,8 @@ def test_all_below_threshold_gives_empty_day(settings, store):
     s = settings.model_copy(update={"min_upvotes": 10})
     assert make(s, store, FakeHF({D: [mk(1, votes=2)]}), FakeLLM()).run(D) == []
     assert store.is_date_done(D)
+
+
+def test_secondary_category_stored(settings, store):
+    make(settings, store, FakeHF({D: [mk(1)]}), FakeLLM(responder=schema_responder)).run(D)
+    assert store.papers_for_date(D)[0].secondary_category == "Robotics & Embodied AI"
