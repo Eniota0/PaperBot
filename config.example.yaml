@@ -18,6 +18,12 @@ ollama:
   timeout_s: 180
   think: false               # disable "thinking" mode (faster); null = model default
 
+# Vote badges (display only). The highest tier a paper reaches is shown. Remove all to disable.
+tiers:
+  - {name: Bronze,   emoji: "🥉", min_upvotes: 50,  color: "#CD7F32"}
+  - {name: Gold,     emoji: "🥇", min_upvotes: 100, color: "#D4AF37"}
+  - {name: Platinum, emoji: "💎", min_upvotes: 200, color: "#7F9BB3"}
+
 categories:
   - name: LLMs & Reasoning
     emoji: "🧠"

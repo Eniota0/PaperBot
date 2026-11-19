@@ -125,6 +125,7 @@ starts with Windows by default.
 | `ranking.trust_weight` | `0.05` | `score = upvotes × (1 + weight × trust)`, so at most +25% |
 | `ollama.model` | `qwen3.5:4b` | Any Ollama model; run `ollama pull <name>` first |
 | `ollama.think` | `false` | Turns off "thinking" on Qwen3-style models (much faster). Use `null` for models without a thinking mode if Ollama complains |
+| `tiers` | Bronze 50+ 🥉 · Gold 100+ 🥇 · Platinum 200+ 💎 | Vote badges: emoji and bold title in Discord, colored label in the PDF. Display only; remove all to disable |
 | `categories` | 12 categories | Name, emoji, and a one-line description used by the LLM. Must include `Other` |
 
 **Author trust** only counts authors whose Hugging Face account is linked to the paper. Others are ignored.

@@ -10,7 +10,9 @@ from pathlib import Path
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
+from paperbot.config import Tier
 from paperbot.models import CategoryGroup, RankedPaper
+from paperbot.ranking import tier_for
 
 logging.getLogger("fontTools").setLevel(logging.ERROR)
 logging.getLogger("fpdf").setLevel(logging.ERROR)
@@ -32,7 +34,12 @@ def paper_sections(rp: RankedPaper) -> list[tuple[str, str | list[str]]]:
     return [("Summary", e.summary), ("Use cases", e.use_cases), ("What's new", e.whats_new)]
 
 
-def render_category_pdf(d: date, group: CategoryGroup, out_path: Path) -> Path:
+def tier_label(rp: RankedPaper, tiers: list[Tier]) -> tuple[str, tuple[int, int, int]] | None:
+    t = tier_for(rp.paper.upvotes, list(tiers))
+    return (t.name.upper(), t.rgb) if t else None
+
+
+def render_category_pdf(d: date, group: CategoryGroup, out_path: Path, tiers: list[Tier] = ()) -> Path:
     assets = files("paperbot.assets")
     with as_file(assets / "DejaVuSans.ttf") as reg, as_file(assets / "DejaVuSans-Bold.ttf") as bold:
         pdf = FPDF(format="A4")
@@ -57,7 +64,19 @@ def render_category_pdf(d: date, group: CategoryGroup, out_path: Path) -> Path:
             if p.authors:
                 pdf.multi_cell(w, 5, ", ".join(a.name for a in p.authors), **NL)
             star = "   ★ trusted author" if rp.trust else ""
-            pdf.multi_cell(w, 5, f"▲ {p.upvotes} upvotes{star}", **NL)
+            label = tier_label(rp, tiers)
+            if label:
+                name, rgb = label
+                votes = f"▲ {p.upvotes} upvotes   "
+                pdf.cell(pdf.get_string_width(votes), 5, votes)
+                pdf.set_font("DejaVu", "B", 9)
+                pdf.set_text_color(*rgb)
+                pdf.cell(pdf.get_string_width(f"● {name}") + 1, 5, f"● {name}")
+                pdf.set_text_color(0, 0, 0)
+                pdf.set_font("DejaVu", "", 9)
+                pdf.cell(0, 5, star, **NL)
+            else:
+                pdf.multi_cell(w, 5, f"▲ {p.upvotes} upvotes{star}", **NL)
             pdf.set_text_color(30, 80, 200)
             pdf.cell(0, 5, "Hugging Face page", link=p.hf_url, **NL)
             pdf.cell(0, 5, "arXiv", link=p.arxiv_url, **NL)
@@ -85,8 +104,8 @@ def render_category_pdf(d: date, group: CategoryGroup, out_path: Path) -> Path:
     return out_path
 
 
-def get_or_render_pdf(pdf_dir: Path, d: date, group: CategoryGroup) -> Path:
+def get_or_render_pdf(pdf_dir: Path, d: date, group: CategoryGroup, tiers: list[Tier] = ()) -> Path:
     path = pdf_path(pdf_dir, d, group.category.name)
     if path.exists():
         return path
-    return render_category_pdf(d, group, path)
+    return render_category_pdf(d, group, path, tiers)

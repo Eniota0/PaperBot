@@ -55,3 +55,19 @@ def test_cache_reuses_file(tmp_path):
 def test_pdf_path_slug():
     assert pdf_path(Path("d"), D, "Multimodal / Vision-Language").name == "2026-11-15_multimodal-vision-language.pdf"
     assert pdf_path(Path("d"), D, "LLMs & Reasoning").name == "2026-11-15_llms-reasoning.pdf"
+
+
+from test_tiers import TIERS
+
+
+def test_tier_label():
+    from paperbot.pdf import tier_label
+    assert tier_label(rp(GOOD), TIERS) is None  # 42 upvotes
+    hot = rp(GOOD).model_copy(update={"paper": rp(GOOD).paper.model_copy(update={"upvotes": 230})})
+    assert tier_label(hot, TIERS) == ("PLATINUM", (127, 155, 179))
+
+
+def test_renders_with_tiers(tmp_path):
+    hot = rp(GOOD).model_copy(update={"paper": rp(GOOD).paper.model_copy(update={"upvotes": 130})})
+    p = render_category_pdf(D, group(hot), tmp_path / "t.pdf", TIERS)
+    assert p.read_bytes()[:5] == b"%PDF-"

@@ -18,6 +18,19 @@ class Category(BaseModel):
     description: str
 
 
+class Tier(BaseModel):
+    """Vote badge, e.g. Gold for 100+ upvotes. Display only; does not affect ranking."""
+    name: str
+    emoji: str
+    min_upvotes: int
+    color: str = "#888888"  # hex, used in the PDF
+
+    @property
+    def rgb(self) -> tuple[int, int, int]:
+        h = self.color.lstrip("#")
+        return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
 class RankingSettings(BaseModel):
     trust_vote_threshold: int = 50
     trust_cap: int = 5
@@ -43,6 +56,7 @@ class Settings(BaseModel):
     ranking: RankingSettings = RankingSettings()
     ollama: OllamaSettings = OllamaSettings()
     categories: list[Category]
+    tiers: list[Tier] = []
 
     @field_validator("schedule_utc", mode="before")
     @classmethod

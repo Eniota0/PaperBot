@@ -63,7 +63,7 @@ class CategoryPdfSelect(
         if group is None:
             await interaction.followup.send("No data for that day.", ephemeral=True)
             return
-        path = await asyncio.to_thread(get_or_render_pdf, bot.settings.pdf_dir, self.d, group)
+        path = await asyncio.to_thread(get_or_render_pdf, bot.settings.pdf_dir, self.d, group, bot.settings.tiers)
         await interaction.followup.send(
             f"{group.category.emoji} **{group.category.name}** — {self.d:%Y-%m-%d}",
             file=discord.File(path),
@@ -182,7 +182,7 @@ class PaperBot(discord.Client):
                 if not (perms.send_messages and perms.embed_links):
                     log.warning("Missing Send Messages / Embed Links permission in channel %s", channel_id)
                     return False
-            digest = build_digest(d, groups, self.settings.top_n)
+            digest = build_digest(d, groups, self.settings.top_n, self.settings.tiers)
             for i, chunk in enumerate(chunk_embeds(digest.embeds)):
                 embeds = [discord.Embed(title=e.title, description=e.description, color=EMBED_COLOR) for e in chunk]
                 # header rides with the first embeds, so a failure never leaves a lone header behind

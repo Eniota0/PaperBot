@@ -50,3 +50,30 @@ def test_chunk_embeds_respects_count_and_chars():
     chunks = chunk_embeds(embeds)
     assert sum(len(c) for c in chunks) == 25
     assert all(len(c) <= 10 and sum(len(e.title) + len(e.description) for e in c) <= 6000 for c in chunks)
+
+
+from test_tiers import TIERS
+
+
+def votes_group(*votes):
+    rps = [RankedPaper(paper=Paper(arxiv_id=f"2611.{i:05d}", date=D, title=f"T{i}", upvotes=v),
+                       rank=i, score=v, trust=0) for i, v in enumerate(votes, 1)]
+    return CategoryGroup(category=CAT, papers=rps, total_upvotes=sum(votes))
+
+
+def test_tier_badge_and_bold_title():
+    lines = build_digest(D, [votes_group(231, 120, 60, 10)], 10, TIERS).embeds[0].description.split("\n")
+    assert lines[0] == "1. ▲231 💎 **[T1](https://huggingface.co/papers/2611.00001)**"
+    assert lines[1].startswith("2. ▲120 🥇 **[T2]")
+    assert lines[2].startswith("3. ▲60 🥉 **[T3]")
+    assert lines[3] == "4. ▲10 [T4](https://huggingface.co/papers/2611.00004)"
+
+
+def test_header_counts_tiers_highest_first():
+    d = build_digest(D, [votes_group(231, 120, 110, 60, 10)], 10, TIERS)
+    assert d.header == "📚 HF Papers — 2026-11-15 · 5 papers · 💎 1 · 🥇 2 · 🥉 1"
+
+
+def test_no_tiers_keeps_plain_output():
+    d = build_digest(D, [votes_group(231)], 10)
+    assert d.header.endswith("1 papers") and "**" not in d.embeds[0].description

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from paperbot.config import Category, RankingSettings
+from paperbot.config import Category, RankingSettings, Tier
 from paperbot.models import CategoryGroup, Paper, RankedPaper
 
 
@@ -42,3 +42,8 @@ def rank_day(
     order = {c.name: i for i, c in enumerate(categories)}
     groups.sort(key=lambda g: (-g.total_upvotes, order[g.category.name]))
     return groups
+
+
+def tier_for(upvotes: int, tiers: list[Tier]) -> Tier | None:
+    reached = [t for t in tiers if upvotes >= t.min_upvotes]
+    return max(reached, key=lambda t: t.min_upvotes) if reached else None
