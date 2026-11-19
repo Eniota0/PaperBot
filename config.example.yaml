@@ -31,7 +31,7 @@ categories:
     description: Large language models, pretraining, reasoning, chain-of-thought, math and code generation. If the focus is an agent acting with tools, use Agents; if it is mainly training data or recipes, use Training & Data.
   - name: Agents
     emoji: "🤖"
-    description: Software agents built on LLMs - tool use, planning, web/GUI/computer-use agents, multi-agent systems. Agents that control physical robots go to Robotics & Embodied AI.
+    description: Software agents built on LLMs or VLMs acting in digital or virtual environments - tool use, planning, web/GUI/computer-use agents, video game agents, multi-agent systems. Agents that control physical robots go to Robotics & Embodied AI.
   - name: Multimodal / Vision-Language
     emoji: "🖼️"
     description: Models combining text with images or video for understanding (VLMs, visual QA, captioning, document understanding). Generating images or video goes to Image & Video Generation.
@@ -46,7 +46,7 @@ categories:
     description: Speech recognition, text-to-speech, voice, music and audio generation or understanding.
   - name: Robotics & Embodied AI
     emoji: "🦾"
-    description: Physical robots and embodied agents - manipulation, navigation, vision-language-action models, robot learning, simulation for robots. Includes LLM- or agent-based robots.
+    description: Physical robots and embodied agents in the real world (or robot simulators) - manipulation, locomotion, navigation, robot learning, vision-language-action models for robots. Includes LLM- or agent-based robots. Agents that play video games or act in virtual/software worlds are NOT robotics.
   - name: Efficiency & Inference
     emoji: "⚡"
     description: Making models cheaper or faster - quantization, distillation, pruning, sparse/MoE efficiency, serving, long-context efficiency, hardware.

@@ -9,6 +9,11 @@ Rules:
 - "secondary": a second category ONLY if the paper clearly and substantially belongs
   to it too; otherwise "none". Most papers have "none". Never repeat the main category.
 - Use "Other" only if none of the categories fit.
+- Examples (title -> answer):
+  "A generalist vision-language-action model that plays video games" -> {"category": "Agents", "secondary": "none"}  (virtual world, no physical robot)
+  "LLM-powered agents that plan and control real robot arms" -> {"category": "Robotics & Embodied AI", "secondary": "Agents"}
+  "A 4-bit quantization method for LLMs" -> {"category": "Efficiency & Inference", "secondary": "none"}
+  "A new benchmark for web-browsing agents" -> {"category": "Benchmarks & Evaluation", "secondary": "Agents"}
 - Answer with JSON: {"category": "<exact category name>", "secondary": "<exact category name or none>"}
 
 Paper title: $title

@@ -57,3 +57,11 @@ def test_tie_break_hints_in_example_config(settings):
     robotics = settings.category("Robotics & Embodied AI").description
     agents = settings.category("Agents").description
     assert "agent" in robotics.lower() and "robot" in agents.lower()
+    assert "physical" in robotics.lower() and "game" in agents.lower()
+    assert "game" in robotics.lower()  # explicit: game/virtual agents are NOT robotics
+
+
+def test_prompt_has_worked_examples(settings, paper):
+    llm = FakeLLM([{"category": "Agents"}])
+    categorize(paper, settings.categories, llm)
+    assert "Examples" in llm.prompts[0] and "video game" in llm.prompts[0]
