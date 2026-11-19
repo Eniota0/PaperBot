@@ -1,7 +1,9 @@
 """UTC date logic: target date, catch-up ranges, new-channel baseline."""
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
+
+UTC = timezone.utc
 
 
 def target_date(now: datetime, delay_days: int) -> date:

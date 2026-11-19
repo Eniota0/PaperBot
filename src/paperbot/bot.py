@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import UTC, date, datetime
+from datetime import date, datetime, timezone
+
+UTC = timezone.utc
 
 import discord
 from discord import app_commands

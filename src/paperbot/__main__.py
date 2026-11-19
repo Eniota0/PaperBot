@@ -4,7 +4,9 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
-from datetime import UTC, date, datetime
+from datetime import date, datetime, timezone
+
+UTC = timezone.utc
 from pathlib import Path
 
 from paperbot.config import load_settings, setup_logging

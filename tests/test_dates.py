@@ -1,4 +1,6 @@
-from datetime import UTC, date, datetime, time
+from datetime import date, datetime, time, timezone
+
+UTC = timezone.utc
 from zoneinfo import ZoneInfo
 
 from paperbot.dates import catchup_dates, new_channel_baseline, target_date
