@@ -9,9 +9,11 @@ from paperbot.llm import LLMError, LLMUnavailable
 
 
 class OllamaProvider:
-    def __init__(self, url: str, model: str, timeout_s: float = 180, client: httpx.Client | None = None):
+    def __init__(self, url: str, model: str, timeout_s: float = 180,
+                 client: httpx.Client | None = None, think: bool | None = None):
         self.url = url.rstrip("/")
         self.model = model
+        self.think = think
         self.client = client or httpx.Client(timeout=timeout_s)
 
     def complete_json(self, prompt: str, schema: dict) -> dict:
@@ -22,6 +24,8 @@ class OllamaProvider:
             "stream": False,
             "options": {"temperature": 0.2},
         }
+        if self.think is not None:
+            body["think"] = self.think
         try:
             resp = self.client.post(f"{self.url}/api/chat", json=body)
         except httpx.ConnectError as e:

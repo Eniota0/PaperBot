@@ -26,8 +26,9 @@ class RankingSettings(BaseModel):
 
 class OllamaSettings(BaseModel):
     url: str = "http://localhost:11434"
-    model: str = "qwen2.5:7b-instruct"
+    model: str = "qwen3.5:4b"
     timeout_s: float = 180
+    think: bool | None = False  # False disables "thinking" on Qwen3-style models; None = model default
 
 
 class Settings(BaseModel):

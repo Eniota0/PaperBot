@@ -14,8 +14,9 @@ ranking:
 
 ollama:
   url: http://localhost:11434
-  model: qwen2.5:7b-instruct
+  model: qwen3.5:4b           # small enough for laptop GPUs (~3-4 GB VRAM)
   timeout_s: 180
+  think: false               # disable "thinking" mode (faster); null = model default
 
 categories:
   - name: LLMs & Reasoning

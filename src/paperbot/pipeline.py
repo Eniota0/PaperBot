@@ -76,5 +76,5 @@ def build_pipeline(settings: Settings) -> Pipeline:
         settings,
         Storage(settings.db_path),
         HFClient(),
-        OllamaProvider(o.url, o.model, o.timeout_s),
+        OllamaProvider(o.url, o.model, o.timeout_s, think=o.think),
     )

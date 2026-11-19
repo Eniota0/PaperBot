@@ -30,10 +30,10 @@ The bot works only while it is running. If your PC was off, it catches up on mis
 - **Ollama 0.5 or newer** (runs the local model on your GPU): <https://ollama.com/download/windows>
 - **Git** (optional, to clone this repository).
 
-Then download the model (about 5 GB; an RTX 3060 runs it well). In PowerShell:
+Then download the model (a few GB; it runs on laptop GPUs as well as an RTX 3060). In PowerShell:
 
 ```powershell
-ollama pull qwen2.5:7b-instruct
+ollama pull qwen3.5:4b
 ```
 
 ### 2. Create the Discord bot
@@ -123,7 +123,8 @@ starts with Windows by default.
 | `ranking.trust_vote_threshold` | `50` | A previous paper counts towards trust if it got at least this many upvotes |
 | `ranking.trust_cap` | `5` | Most trust points an author can have |
 | `ranking.trust_weight` | `0.05` | `score = upvotes × (1 + weight × trust)`, so at most +25% |
-| `ollama.model` | `qwen2.5:7b-instruct` | Any Ollama model; run `ollama pull <name>` first |
+| `ollama.model` | `qwen3.5:4b` | Any Ollama model; run `ollama pull <name>` first |
+| `ollama.think` | `false` | Turns off "thinking" on Qwen3-style models (much faster). Use `null` for models without a thinking mode if Ollama complains |
 | `categories` | 12 categories | Name, emoji, and a one-line description used by the LLM. Must include `Other` |
 
 **Author trust** only counts authors whose Hugging Face account is linked to the paper. Others are ignored.

@@ -58,3 +58,17 @@ def test_read_timeout_is_unavailable():  # review I1
     respx.post(URL).mock(side_effect=httpx.ReadTimeout("slow"))
     with pytest.raises(LLMUnavailable):
         provider().complete_json("p", SCHEMA)
+
+
+@respx.mock
+def test_think_flag_sent_when_set():
+    route = respx.post(URL).mock(return_value=httpx.Response(200, json={"message": {"content": "{}"}}))
+    OllamaProvider("http://localhost:11434", "m", think=False).complete_json("p", SCHEMA)
+    assert json.loads(route.calls.last.request.content)["think"] is False
+
+
+@respx.mock
+def test_think_flag_omitted_by_default():
+    route = respx.post(URL).mock(return_value=httpx.Response(200, json={"message": {"content": "{}"}}))
+    provider().complete_json("p", SCHEMA)
+    assert "think" not in json.loads(route.calls.last.request.content)
